@@ -9,4 +9,5 @@ export default{
     BUSINESS_PHONE: process.env.BUSINESS_PHONE,
     API_VERSION: process.env.API_VERSION,
     PORT: process.env.PORT || 3000,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
 };

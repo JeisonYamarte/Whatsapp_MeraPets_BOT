@@ -1,10 +1,12 @@
 import whatsappService from "./whatsappService.js";
 import appendToSheets from "./googleSheetsService.js";
+import openrouterService from "./openAIService.js";
 
 class MessageHandler {
 
     constructor() {
         this.appointmentState = {};
+        this.asistandState = {};
     }
 
     async handleIncomingMessage(message, senderInfo) {
@@ -21,6 +23,10 @@ class MessageHandler {
 
             } else if(this.appointmentState[message.from]) {
                 await this.handleAppointmentFlow(message.from, incomingMessage);
+                return;
+
+            }else if(this.asistandState[message.from]){
+                await this.handleAsistandFlow(message.from, incomingMessage);
                 return;
 
             } else{
@@ -72,7 +78,8 @@ class MessageHandler {
                 response = "por favor, ingresa tu nombre:";
                 break;
             case "opcion_2":
-                response = "Consultar Usuario";
+                this.asistandState[to] = { step: 'question' };
+                response = "Haz tu consulta";
                 break;
             case "opcion_3":
                 response = "Ubicacion Local";
@@ -150,6 +157,26 @@ class MessageHandler {
                 break;
         }
         await whatsappService.sendMessage(to, response);
+    }
+
+    async handleAsistandFlow(to, message) {
+        const state = this.asistandState[to] || {};
+        let response;
+
+        const menuMessage = '¿la respuesta fue de tu ayuda?';
+        const buttons= [
+            { type: "reply", reply: { id: "opcion_4", title: "si, gracias" } },
+            { type: "reply", reply: { id: "opcion_5", title: "hacer otra pregunta." } },
+            { type: "reply", reply: { id: "opcion_6", title: "Emergencia" } }
+        ];
+
+        if (state.step === 'question'){
+            response = await openrouterService(message);
+        }
+
+        delete this.asistandState[to];
+        await whatsappService.sendMessage(to, response || "error");
+        await whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
     }
 
     
