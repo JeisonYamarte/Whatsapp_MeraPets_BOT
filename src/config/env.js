@@ -10,4 +10,5 @@ export default{
     API_VERSION: process.env.API_VERSION,
     PORT: process.env.PORT || 3000,
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    WHATSAPP_API_URL: process.env.WHATSAPP_API_URL,
 };
