@@ -1,6 +1,6 @@
 import whatsappService from "./whatsappService.js";
 import appendToSheets from "./googleSheetsService.js";
-import openrouterService from "./openAIService.js";
+import openrouterService from "./openRouterService.js";
 
 class MessageHandler {
 
@@ -82,7 +82,12 @@ class MessageHandler {
                 response = "Haz tu consulta";
                 break;
             case "opcion_3":
-                response = "Ubicacion Local";
+                await this.sendLocation(to);
+                response = "Ubicacion del Local";
+                break;
+            case "opcion_6":
+                response = "si es una emergencia, por favor llama a este contacto";
+                await this.sendContact(to);
                 break;
             default:
                 response = "Opcion no valida";
@@ -177,6 +182,66 @@ class MessageHandler {
         delete this.asistandState[to];
         await whatsappService.sendMessage(to, response || "error");
         await whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
+    }
+
+    async sendContact(to){
+        const contact = {
+            addresses: [
+              {
+                street: "123 Calle de las Mascotas",
+                city: "Ciudad",
+                state: "Estado",
+                zip: "12345",
+                country: "País",
+                country_code: "PA",
+                type: "WORK"
+              }
+            ],
+            emails: [
+              {
+                email: "contacto@merapet.com",
+                type: "WORK"
+              }
+            ],
+            name: {
+              formatted_name: "MeraPet Contacto",
+              first_name: "MedPet",
+              last_name: "Contacto",
+              middle_name: "",
+              suffix: "",
+              prefix: ""
+            },
+            org: {
+              company: "MeraPet",
+              department: "Atención al Cliente",
+              title: "Representante"
+            },
+            phones: [
+              {
+                phone: "+1234567890",
+                wa_id: "1234567890",
+                type: "WORK"
+              }
+            ],
+            urls: [
+              {
+                url: "https://www.merapet.com",
+                type: "WORK"
+              }
+            ]
+        }
+        await whatsappService.sendContactMessage(to, contact);
+    }
+
+
+    async sendLocation(to){
+        const location = {
+            latitude: 37.7749,
+            longitude: -122.4194,
+            name: "Ubicación de MeraPet",
+            address: "123 Market St, San Francisco, CA 94103, USA"
+        }
+        await whatsappService.sendLocationMessage(to, location);
     }
 
     
