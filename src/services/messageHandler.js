@@ -30,7 +30,7 @@ class MessageHandler {
                 return;
 
             } else{
-                const response = `echo ${message.text.body}`;
+                const response = `gracias por preferirnos`;
                 await whatsappService.sendMessage(message.from, response, message.id);
                 await whatsappService.markAsRead(message.id);
             } 
@@ -77,7 +77,7 @@ class MessageHandler {
                 this.appointmentState[to] = { step: 'name' };
                 response = "por favor, ingresa tu nombre:";
                 break;
-            case "opcion_2":
+            case "opcion_2" || "opcion_5":
                 this.asistandState[to] = { step: 'question' };
                 response = "Haz tu consulta";
                 break;
